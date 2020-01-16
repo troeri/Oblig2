@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-
+#include <sqlite3.h>
 
 struct brukerkonto {
   char brukernavn[100];
@@ -13,14 +13,14 @@ struct brukerkonto {
 typedef struct brukerkonto konto_t;
 
 void les_data   (konto_t *brukertabell);
-void skriv_data (int argc, char **argv, konto_t *brukertabell);
+//void skriv_data (int argc, char **argv, konto_t *brukertabell);
 
 int main(int argc, char** argv) {
   
   konto_t brukertabell[200];
 
   les_data  (brukertabell);
-  skriv_data(argc, argv, brukertabell);
+  //skriv_data(argc, argv, brukertabell);
 
   return 0;
 }
@@ -31,10 +31,26 @@ void les_data (konto_t *brukertabell) {
   char linje[256], *ord[20];
   char *bnavn, *fnavn, *enavn, *splitt, *splittnavn, *temp1, *siste;
   int uid, bindex=0, index;
+  int rc;
+  sqlite3 *db;
+
+  char *brukernavn, *navn, *testuid;
+  
+  sqlite3_stmt *res;
 
   FILE *filpeker = fopen("/etc/passwd", "r");
 
-  while (fgets(linje, sizeof(linje), filpeker)) {
+  sqlite3_open("bruker.db", &db);
+  rc = sqlite3_prepare_v2(db, "select * from Bruker where uid>1000", 1000, &res, NULL);
+
+  while (sqlite3_step(res) == SQLITE_ROW) {
+    brukernavn = (char*) sqlite3_column_text(res, 0);
+    navn = (char*) sqlite3_column_text(res, 4);
+    testuid = (char*) sqlite3_column_text(res, 2);
+
+    printf("%s -- %s -- %s\n", brukernavn, testuid, navn); 
+  }
+  /*while (fgets(linje, sizeof(linje), filpeker)) {
     splitt = strtok(linje, ":"); //<-- initialiserer splitt av linje
     index=0;
     while (splitt) { //<-- legger hvert splitta ord i tabell
@@ -70,7 +86,7 @@ void les_data (konto_t *brukertabell) {
 
   fclose (filpeker);
   
-}//les_data
+  }//les_data*/
 
 void skriv_data (int argc, char **argv, konto_t *brukertabell) {
 
@@ -145,5 +161,6 @@ void skriv_data (int argc, char **argv, konto_t *brukertabell) {
   }
    
   
+}
 }//skriv_data
 
