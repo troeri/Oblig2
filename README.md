@@ -1,4 +1,5 @@
-# Oblig2
+# Oblig2 DA-ODA
+
 Obligatorisk Oppgave 2, DA-ODA
 
-## Bygger på Oblig 1 - Adder databaser
+#### Databaser, SQLite3 og normalisering med C og Bash
